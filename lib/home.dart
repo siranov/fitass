@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+double start = 17.25;
+double end = 19;
+
+
+
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
@@ -19,47 +24,28 @@ class _HomeState extends State<Home> {
               shrinkWrap: true,
               children: [
                 const Text('FITASS',
-                    style:
-                        TextStyle(fontSize: 48, fontWeight: FontWeight.bold)),
-                spacer(hlf: true),
-                const Text(
+                    style: TextStyle(
+                        decoration: TextDecoration.underline,
+                        fontSize: 48,
+                        fontWeight: FontWeight.bold)),
+                spacer(),
+                Text(
                   '(Fitness accountability success service)',
+                  style: TextStyle(color: Colors.black.withOpacity(0.5)),
                   textAlign: TextAlign.end,
                 ),
                 spacer(),
                 spacer(hlf: true),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text('Start workout'),
-                        hor(),
-                        box('3 PM'),
-                      ],
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text('End workout'),
-                        hor(),
-                        box('5 PM'),
-                      ],
-                    ),
-                  ],
-                ),
+                Rng(),
                 spacer(),
-                spacer(hlf: true),
                 const Text('Workout types to track'),
                 spacer(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    button('Cardio'),
-                    button('Stretch'),
-                    button('Power'),
+                    button('Cardio', onTap: () {}),
+                    button('Stretch', onTap: () {}),
+                    button('Power', onTap: () {}),
                   ],
                 ),
                 spacer(),
@@ -69,8 +55,8 @@ class _HomeState extends State<Home> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    button('Public ', width: 150),
-                    button('Private 🔒', width: 150),
+                    button('Public 📢', width: 150, onTap: () {}),
+                    button('Private 🔒', width: 150, onTap: () {}),
                   ],
                 ),
                 spacer(),
@@ -110,7 +96,7 @@ class _HomeState extends State<Home> {
                   ),
                 ),
                 spacer(),
-                button("join fitass"),
+                button("Join", onTap: () {}),
               ],
             ),
           ),
@@ -118,6 +104,20 @@ class _HomeState extends State<Home> {
       ),
     );
   }
+
+}
+
+retTime(val) {
+  var ret;
+  var str = val.toString().split(".");
+  if(str.length>1){
+    print((double.parse('0.'+str[1])*15));
+    ret = (int.parse(str[0])+(val>12?-12:0)).toString() +":"+ 
+    (double.parse('0.'+str[1])*60).toString();
+  }else{
+    ret = (int.parse(str[0])+(val>12?-12:0)).toString();
+  }
+  return ret + (val>12?' PM':' AM');
 }
 
 Widget spacer({hlf}) {
@@ -128,16 +128,19 @@ Widget hor() {
   return Container(width: 10);
 }
 
-button(text, {width}) {
+button(text, {width, onTap}) {
   return GestureDetector(
-    child: box(text, width:width),
+    onTap: () {
+      onTap();
+    },
+    child: box(text, width: width),
   );
 }
 
 Widget box(child, {width, color}) {
   return Container(
     height: 30,
-    width: width!=null?width:null,
+    width: width != null ? width : null,
     decoration: BoxDecoration(
       color: color != null ? color : Colors.grey,
       borderRadius: BorderRadius.circular(8),
@@ -159,4 +162,42 @@ Widget box(child, {width, color}) {
           )),
     ),
   );
+}
+
+class Rng extends StatefulWidget {
+  const Rng({Key? key}) : super(key: key);
+
+  @override
+  State<Rng> createState() => _RngState();
+}
+
+class _RngState extends State<Rng> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Start: ${retTime(start)}'),
+            Text('End: ${retTime(end)}'),
+          ],
+        ),
+        RangeSlider(
+            divisions: 96,
+            min: 0,
+            max: 24,
+            values: RangeValues(start, end),
+            onChanged: (val) {
+              if (val.end - val.start >= 0.5 && val.end < 23) {
+                start = val.start;
+                end = val.end;
+                print([start, end]);
+                setState(() {});
+              }
+            }),
+      ],
+    );
+  }
 }
